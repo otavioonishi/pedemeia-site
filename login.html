@@ -1,37 +1,13 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pé de Meia – Entrar</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:sans-serif;min-height:100vh;background:linear-gradient(135deg,#004a8f,#1ab0f0);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
-.card{background:white;border-radius:24px;padding:32px 28px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
-h2{font-size:24px;color:#004a8f;margin-bottom:6px}
-p{color:#888;font-size:14px;margin-bottom:24px}
-.tabs{display:flex;background:#f0f6ff;border-radius:12px;padding:4px;margin-bottom:24px;gap:4px}
-.tab{flex:1;padding:10px;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;background:transparent;color:#7a8fa6}
-.tab.active{background:#004a8f;color:white}
-label{display:block;font-size:13px;font-weight:700;color:#3a5070;margin-bottom:6px}
-input{width:100%;padding:12px 14px;border:2px solid #e0eaf5;border-radius:10px;font-size:15px;margin-bottom:14px;outline:none}
-input:focus{border-color:#0a72b8}
-button.btn{width:100%;padding:14px;border:none;border-radius:12px;background:#004a8f;color:white;font-size:16px;font-weight:700;cursor:pointer;margin-top:4px}
-.msg{margin-top:12px;padding:10px;border-radius:10px;font-size:14px;font-weight:700;text-align:center;display:none}
-.msg.ok{background:#dcfce7;color:#15803d;display:block}
-.msg.err{background:#fee2e2;color:#b91c1c;display:block}
-</style>
-</head>
-<body>
-<div style="color:white;font-size:28px;font-weight:900;margin-bottom:20px">🎓 PÉ DE MEIA</div>
-<div class="card">
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('login')">🔐 ENTRAR</button>
-    <button class="tab" onclick="switchTab('reg')">📝 CADASTRAR</button>
-  </div>
 
-  <div id="form-login">
-    <h2>Bem-vindo!</h2>
-    <p>Entre para acessar o conteúdo exclusivo</p>
-    <label>E-MAIL</label>
-    <input type="email" id="l-
+fetch('/login', {
+  method: 'POST',
+  headers: {'Content-Type':'application/json'},
+  body: JSON.stringify({email, senha})
+})
+.then(res => res.json())
+.then(data => {
+  if(data.usuario){
+    sessionStorage.setItem('usuario', JSON.stringify(data.usuario));
+    window.location.href = 'dashboard.html';
+  }
+});
