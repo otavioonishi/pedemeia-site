@@ -1,16 +1,16 @@
 const express = require('express');
-const fs      = require('fs');
-const crypto  = require('crypto');
-const cors    = require('cors');
-const path    = require('path');
+const fs = require('fs');
+const crypto = require('crypto');
+const cors = require('cors');
+const path = require('path');
 
-const app  = express();
+const app = express();
 const PORT = process.env.PORT || 3000;
-const DB   = path.join(__dirname, 'usuarios.json');
+const DB = path.join(__dirname, 'usuarios.json');
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname)));
 
 function lerDB() {
   if (!fs.existsSync(DB)) fs.writeFileSync(DB, JSON.stringify([]));
@@ -24,6 +24,14 @@ function salvarDB(dados) {
 function hashSenha(senha) {
   return crypto.createHash('sha256').update(senha + 'pedemeia_salt_2025').digest('hex');
 }
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'login.html'));
+});
+
+app.get('/login.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'login.html'));
+});
 
 app.post('/cadastro', (req, res) => {
   const { nome, email, senha } = req.body;
