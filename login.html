@@ -112,6 +112,27 @@
     }
 
     .links a:hover { text-decoration: underline; }
+
+    .signupBox {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(15, 118, 110, 0.08);
+      border: 1px solid rgba(15, 118, 110, 0.18);
+    }
+
+    .signupBox strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .signupBox a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .signupBox a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -133,6 +154,14 @@
     <div class="links">
       <span>Não tem conta?</span>
       <a href="cadastro.html">Criar cadastro</a>
+    </div>
+
+    <div class="signupBox">
+      <strong>Conta nova?</strong>
+      <span>Se aparecer “e-mail ou senha incorretos”, crie seu acesso em alguns segundos.</span>
+      <div style="margin-top: 8px;">
+        <a href="cadastro.html">Criar conta nova</a>
+      </div>
     </div>
   </main>
 
@@ -160,10 +189,11 @@
           }),
         });
 
-        const data = await response.json();
+        const raw = await response.text();
+        const data = raw ? JSON.parse(raw) : {};
 
         if (!response.ok) {
-          throw new Error(data.erro || 'Não foi possível entrar.');
+          throw new Error(data.erro || 'E-mail ou senha incorretos. Crie uma conta nova se ainda não tiver acesso.');
         }
 
         sessionStorage.setItem('usuario', JSON.stringify(data.usuario));

@@ -104,6 +104,27 @@
     }
 
     .links a:hover { text-decoration: underline; }
+
+    .successBox {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(4, 120, 87, 0.08);
+      border: 1px solid rgba(4, 120, 87, 0.18);
+    }
+
+    .successBox strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .successBox a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .successBox a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -128,6 +149,11 @@
     <div class="links">
       <span>Já tem conta?</span>
       <a href="login.html">Entrar</a>
+    </div>
+
+    <div class="successBox">
+      <strong>Depois de criar a conta</strong>
+      <span>Você vai voltar para a tela de login para entrar com o novo e-mail e senha.</span>
     </div>
   </main>
 
@@ -157,7 +183,8 @@
           }),
         });
 
-        const data = await response.json();
+        const raw = await response.text();
+        const data = raw ? JSON.parse(raw) : {};
 
         if (!response.ok) {
           throw new Error(data.erro || 'Não foi possível criar a conta.');
@@ -166,6 +193,9 @@
         message.textContent = data.mensagem || 'Conta criada com sucesso.';
         message.classList.add('success');
         form.reset();
+        window.setTimeout(() => {
+          window.location.href = 'login.html?cadastro=ok';
+        }, 900);
       } catch (error) {
         message.textContent = error.message;
         message.classList.add('error');
@@ -174,6 +204,11 @@
         submitButton.textContent = 'Criar conta';
       }
     });
+
+    if (new URLSearchParams(window.location.search).get('cadastro') === 'ok') {
+      message.textContent = 'Conta criada. Agora faça login.';
+      message.classList.add('success');
+    }
   </script>
 </body>
 </html>
