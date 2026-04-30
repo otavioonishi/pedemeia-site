@@ -3,11 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Entrar | PedeMeia</title>
+  <title>Criar conta | PedeMeia</title>
   <style>
     :root {
       color-scheme: light;
-      --bg: #f5f1e8;
       --card: #ffffff;
       --text: #1f2937;
       --muted: #6b7280;
@@ -15,6 +14,7 @@
       --primary-hover: #115e59;
       --border: #d6d3cc;
       --error: #b91c1c;
+      --success: #047857;
     }
 
     * { box-sizing: border-box; }
@@ -25,13 +25,13 @@
       display: grid;
       place-items: center;
       font-family: Arial, Helvetica, sans-serif;
-      background: linear-gradient(135deg, #f3efe6 0%, #eef2ff 100%);
+      background: linear-gradient(135deg, #f3efe6 0%, #ecfeff 100%);
       color: var(--text);
       padding: 24px;
     }
 
     .card {
-      width: min(100%, 420px);
+      width: min(100%, 460px);
       background: var(--card);
       border: 1px solid rgba(17, 24, 39, 0.08);
       border-radius: 20px;
@@ -39,16 +39,8 @@
       box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
     }
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: 2rem;
-    }
-
-    p {
-      margin: 0 0 24px;
-      color: var(--muted);
-      line-height: 1.5;
-    }
+    h1 { margin: 0 0 8px; font-size: 2rem; }
+    p { margin: 0 0 24px; color: var(--muted); line-height: 1.5; }
 
     label {
       display: block;
@@ -94,7 +86,7 @@
     }
 
     .message.error { color: var(--error); }
-    .message.success { color: var(--primary); }
+    .message.success { color: var(--success); }
 
     .links {
       margin-top: 18px;
@@ -116,28 +108,32 @@
 </head>
 <body>
   <main class="card">
-    <h1>Entrar</h1>
-    <p>Acesse sua conta para continuar no PedeMeia.</p>
+    <h1>Criar conta</h1>
+    <p>Preencha os dados abaixo para registrar seu acesso.</p>
 
-    <form id="loginForm">
+    <form id="signupForm">
+      <label for="nome">Nome</label>
+      <input id="nome" name="nome" type="text" autocomplete="name" required>
+
       <label for="email">E-mail</label>
       <input id="email" name="email" type="email" autocomplete="email" required>
 
       <label for="senha">Senha</label>
-      <input id="senha" name="senha" type="password" autocomplete="current-password" required>
+      <input id="senha" name="senha" type="password" minlength="6" autocomplete="new-password" required>
 
-      <button id="submitButton" type="submit">Entrar</button>
+      <button id="submitButton" type="submit">Criar conta</button>
       <div id="message" class="message" aria-live="polite"></div>
     </form>
 
     <div class="links">
-      <span>Não tem conta?</span>
-      <a href="cadastro.html">Criar cadastro</a>
+      <span>Já tem conta?</span>
+      <a href="login.html">Entrar</a>
     </div>
   </main>
 
   <script>
-    const form = document.getElementById('loginForm');
+    const form = document.getElementById('signupForm');
+    const nomeInput = document.getElementById('nome');
     const emailInput = document.getElementById('email');
     const senhaInput = document.getElementById('senha');
     const message = document.getElementById('message');
@@ -148,13 +144,14 @@
       message.textContent = '';
       message.className = 'message';
       submitButton.disabled = true;
-      submitButton.textContent = 'Entrando...';
+      submitButton.textContent = 'Criando...';
 
       try {
-        const response = await fetch('/login', {
+        const response = await fetch('/cadastro', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            nome: nomeInput.value.trim(),
             email: emailInput.value.trim(),
             senha: senhaInput.value,
           }),
@@ -163,19 +160,18 @@
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.erro || 'Não foi possível entrar.');
+          throw new Error(data.erro || 'Não foi possível criar a conta.');
         }
 
-        sessionStorage.setItem('usuario', JSON.stringify(data.usuario));
-        message.textContent = 'Login realizado com sucesso.';
+        message.textContent = data.mensagem || 'Conta criada com sucesso.';
         message.classList.add('success');
-        window.location.href = 'dashboard.html';
+        form.reset();
       } catch (error) {
         message.textContent = error.message;
         message.classList.add('error');
       } finally {
         submitButton.disabled = false;
-        submitButton.textContent = 'Entrar';
+        submitButton.textContent = 'Criar conta';
       }
     });
   </script>

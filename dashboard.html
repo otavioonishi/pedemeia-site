@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | PedeMeia</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-2: #1f2937;
+      --text: #f8fafc;
+      --muted: #cbd5e1;
+      --accent: #f59e0b;
+      --accent-hover: #d97706;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(245, 158, 11, 0.2), transparent 30%),
+        linear-gradient(180deg, #111827 0%, #0f172a 100%);
+      padding: 24px;
+    }
+
+    .shell {
+      width: min(100%, 960px);
+      margin: 0 auto;
+      display: grid;
+      gap: 20px;
+    }
+
+    .hero, .panel {
+      background: rgba(17, 24, 39, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 28px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    h1, h2, p { margin-top: 0; }
+    p { color: var(--muted); line-height: 1.6; }
+
+    .badge {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: rgba(245, 158, 11, 0.16);
+      color: #fde68a;
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 16px;
+      border-radius: 12px;
+      text-decoration: none;
+      border: 0;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .button.primary {
+      background: var(--accent);
+      color: #111827;
+    }
+
+    .button.primary:hover { background: var(--accent-hover); }
+
+    .button.secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .stat {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 18px;
+      padding: 20px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <div class="badge">Acesso autenticado</div>
+        <h1 id="welcomeTitle">Dashboard</h1>
+        <p id="welcomeText">Carregando informações do usuário.</p>
+      </div>
+      <div class="actions">
+        <a class="button secondary" href="login.html">Trocar conta</a>
+        <a class="button secondary" href="admin.html">Admin</a>
+        <button id="logoutButton" class="button primary" type="button">Sair</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Visão geral</h2>
+      <div class="grid">
+        <div class="stat">
+          <strong>01</strong>
+          <span>Conta ativa neste navegador</span>
+        </div>
+        <div class="stat">
+          <strong>100%</strong>
+          <span>Fluxo de login funcionando</span>
+        </div>
+        <div class="stat">
+          <strong id="emailStat">-</strong>
+          <span>E-mail autenticado</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const usuario = JSON.parse(sessionStorage.getItem('usuario') || 'null');
+
+    if (!usuario) {
+      window.location.replace('login.html');
+    } else {
+      document.getElementById('welcomeTitle').textContent = `Bem-vindo, ${usuario.nome}`;
+      document.getElementById('welcomeText').textContent = `Você entrou com o e-mail ${usuario.email}.`;
+      document.getElementById('emailStat').textContent = usuario.email;
+    }
+
+    document.getElementById('logoutButton').addEventListener('click', () => {
+      sessionStorage.removeItem('usuario');
+      window.location.replace('login.html');
+    });
+  </script>
+</body>
+</html>

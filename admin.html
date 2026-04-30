@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin | PedeMeia</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-2: #1f2937;
+      --text: #f8fafc;
+      --muted: #cbd5e1;
+      --accent: #38bdf8;
+      --accent-hover: #0ea5e9;
+      --danger: #f87171;
+      --border: rgba(255, 255, 255, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 24px;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(56, 189, 248, 0.18), transparent 30%),
+        linear-gradient(180deg, #111827 0%, #0f172a 100%);
+    }
+
+    .shell {
+      width: min(100%, 1100px);
+      margin: 0 auto;
+      display: grid;
+      gap: 20px;
+    }
+
+    .panel {
+      background: rgba(17, 24, 39, 0.88);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 28px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.3);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    h1, h2, p { margin-top: 0; }
+    p { color: var(--muted); line-height: 1.6; }
+
+    label {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin: 16px 0 8px;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 1rem;
+      outline: none;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.16);
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    button, .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .button.primary, button.primary {
+      background: var(--accent);
+      color: #082f49;
+    }
+
+    .button.primary:hover, button.primary:hover { background: var(--accent-hover); }
+
+    .button.secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+    }
+
+    .message {
+      min-height: 1.25rem;
+      margin-top: 16px;
+      font-size: 0.95rem;
+    }
+
+    .message.error { color: var(--danger); }
+    .message.success { color: #34d399; }
+
+    .tableWrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 680px;
+    }
+
+    th, td {
+      padding: 14px 12px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      vertical-align: top;
+    }
+
+    th {
+      color: #93c5fd;
+      font-size: 0.9rem;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .muted { color: var(--muted); }
+    .empty { text-align: center; padding: 28px 12px; }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="panel header">
+      <div>
+        <h1>Painel Admin</h1>
+        <p>Use o token do servidor para visualizar a base de usuários cadastrados.</p>
+      </div>
+      <div class="actions">
+        <a class="button secondary" href="dashboard.html">Voltar ao dashboard</a>
+        <a class="button secondary" href="login.html">Login</a>
+      </div>
+    </section>
+
+    <section class="panel">
+      <form id="adminForm">
+        <label for="token">Token admin</label>
+        <input id="token" name="token" type="password" autocomplete="off" placeholder="Cole aqui o ADMIN_TOKEN">
+        <div class="actions">
+          <button id="loadButton" class="primary" type="submit">Carregar usuários</button>
+          <button id="saveButton" class="secondary" type="button">Salvar token neste navegador</button>
+          <button id="clearButton" class="secondary" type="button">Limpar token</button>
+        </div>
+        <div id="message" class="message" aria-live="polite"></div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <div class="header">
+        <div>
+          <h2>Usuários cadastrados</h2>
+          <p id="summaryText" class="muted">Nenhum carregamento realizado ainda.</p>
+        </div>
+      </div>
+
+      <div class="tableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>E-mail</th>
+              <th>Criado em</th>
+              <th>ID</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <tr>
+              <td class="empty" colspan="4">Nenhum dado carregado.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById('adminForm');
+    const tokenInput = document.getElementById('token');
+    const message = document.getElementById('message');
+    const summaryText = document.getElementById('summaryText');
+    const usersTableBody = document.getElementById('usersTableBody');
+    const loadButton = document.getElementById('loadButton');
+
+    const storedToken = localStorage.getItem('adminToken');
+    if (storedToken) tokenInput.value = storedToken;
+
+    function setMessage(text, kind = '') {
+      message.textContent = text;
+      message.className = 'message';
+      if (kind) message.classList.add(kind);
+    }
+
+    function renderEmpty(text) {
+      usersTableBody.innerHTML = `<tr><td class="empty" colspan="4">${text}</td></tr>`;
+    }
+
+    function renderUsers(usuarios) {
+      if (!usuarios.length) {
+        renderEmpty('Nenhum usuário cadastrado.');
+        summaryText.textContent = '0 usuários encontrados.';
+        return;
+      }
+
+      usersTableBody.innerHTML = usuarios.map((usuario) => `
+        <tr>
+          <td>${usuario.nome}</td>
+          <td>${usuario.email}</td>
+          <td>${new Date(usuario.criadoEm).toLocaleString('pt-BR')}</td>
+          <td class="muted">${usuario.id}</td>
+        </tr>
+      `).join('');
+
+      summaryText.textContent = `${usuarios.length} usuário(s) carregado(s).`;
+    }
+
+    async function carregarUsuarios() {
+      const token = tokenInput.value.trim();
+      if (!token) {
+        setMessage('Informe o token admin.', 'error');
+        return;
+      }
+
+      loadButton.disabled = true;
+      loadButton.textContent = 'Carregando...';
+      setMessage('Buscando usuários...');
+
+      try {
+        const response = await fetch('/admin/usuarios', {
+          headers: { 'x-admin-token': token },
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.erro || 'Não foi possível carregar os usuários.');
+        }
+
+        localStorage.setItem('adminToken', token);
+        renderUsers(data.usuarios || []);
+        setMessage('Usuários carregados com sucesso.', 'success');
+      } catch (error) {
+        renderEmpty('Falha ao carregar dados.');
+        setMessage(error.message, 'error');
+      } finally {
+        loadButton.disabled = false;
+        loadButton.textContent = 'Carregar usuários';
+      }
+    }
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      carregarUsuarios();
+    });
+
+    document.getElementById('saveButton').addEventListener('click', () => {
+      const token = tokenInput.value.trim();
+      if (!token) {
+        setMessage('Informe o token antes de salvar.', 'error');
+        return;
+      }
+
+      localStorage.setItem('adminToken', token);
+      setMessage('Token salvo neste navegador.', 'success');
+    });
+
+    document.getElementById('clearButton').addEventListener('click', () => {
+      localStorage.removeItem('adminToken');
+      tokenInput.value = '';
+      setMessage('Token removido deste navegador.', 'success');
+      summaryText.textContent = 'Nenhum carregamento realizado ainda.';
+      renderEmpty('Nenhum dado carregado.');
+    });
+  </script>
+</body>
+</html>

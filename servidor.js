@@ -7,6 +7,7 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const DB = path.join(__dirname, 'usuarios.json');
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 
 app.use(cors());
 app.use(express.json());
@@ -33,6 +34,14 @@ app.get('/login.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'login.html'));
 });
 
+app.get('/cadastro.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'cadastro.html'));
+});
+
+app.get('/admin.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
 app.post('/cadastro', (req, res) => {
   const { nome, email, senha } = req.body;
   if (!nome || !email || !senha) return res.status(400).json({ erro: 'Preencha todos os campos.' });
@@ -54,7 +63,8 @@ app.post('/login', (req, res) => {
 });
 
 app.get('/admin/usuarios', (req, res) => {
-  if (req.query.chave !== 'minhasenhaadmin') return res.status(403).json({ erro: 'Acesso negado.' });
+  if (!ADMIN_TOKEN) return res.status(503).json({ erro: 'Defina ADMIN_TOKEN no ambiente.' });
+  if (req.get('x-admin-token') !== ADMIN_TOKEN) return res.status(403).json({ erro: 'Acesso negado.' });
   const usuarios = lerDB().map(u => ({ id: u.id, nome: u.nome, email: u.email, criadoEm: u.criadoEm }));
   res.json({ total: usuarios.length, usuarios });
 });
